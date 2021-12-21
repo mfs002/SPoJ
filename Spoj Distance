@@ -1,0 +1,80 @@
+#include <bits/stdc++.h>
+#define int long long
+#define endl '\n'
+using namespace std;
+
+vector<vector<int>> points(100005, vector<int> (6, 0));
+int n, d; int max_sum[64];
+
+int which_ind(int combn[])
+{
+    int maxm = -1; int that_ind = 0;
+
+    for (int i=0; i<n; i++)
+    {
+        int sum = 0;
+        for (int j=0; j<d; j++)
+        {
+            sum += (1 - 2 * combn[j]) * points[i][j];
+        }
+
+        if (sum > maxm)
+        {
+            maxm = sum;
+            that_ind = i;
+        }
+    }
+    return that_ind;
+}
+
+void precompute()
+{
+    for (int i=0; i < (1<<d); i++)
+    {
+        int combn[6] = {0};
+
+        for (int j=0; j<d; j++)
+        {
+            if (i & (1<<j)) combn[d-1-j] = 1;
+        }
+        max_sum[i] = which_ind(combn);
+    }
+}
+
+int md(int curr, int ind)
+{
+    int dist = 0;
+    for (int i=0 ;i<d; i++)
+    {
+        dist += abs(points[ind][i] - points[curr][i]);
+    }
+    return dist;
+}
+
+signed main()
+{
+    cin >> n >> d;
+
+    points.resize(n);
+    for (int i=0; i<n; i++) points[i].resize(d);
+
+    for (int i=0; i<n; i++)
+    {
+        for (int j=0; j<d; j++) cin >> points[i][j];
+    }
+
+    precompute();
+
+    int maxm = -1;
+
+    for (int i=0; i<n; i++)
+    {
+        for (int comb=0; comb < (1<<d); comb++)
+        {
+            maxm = max(maxm, md(i, max_sum[comb]));
+        }
+    }
+
+    cout << maxm << endl;
+
+}
